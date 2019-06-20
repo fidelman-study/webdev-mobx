@@ -2,8 +2,10 @@ import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
 import * as serviceWorker from './serviceWorker';
 import DevTools from 'mobx-react-devtools';
-import { observable } from 'mobx';
+import { observable, configure, action } from 'mobx';
 import { observer } from 'mobx-react';
+
+configure({ enforceActions: 'observed' })
 
 const nickName = observable({
   firstName: 'Andrei',
@@ -19,6 +21,11 @@ const nickName = observable({
   decrement() {
     this.age--;
   },
+}, {
+  increment: action('Plus one'),
+  decrement: action('Minus one'),
+}, {
+  name: 'nickNameObservable'
 });
 
 const todos = observable([
