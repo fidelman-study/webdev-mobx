@@ -7,51 +7,30 @@ import DevTools from 'mobx-react-devtools';
 configure({ enforceActions: 'observed' });
 
 class Store {
-  @observable devsList = [
+  devsList = [
     { name: "Jack", sp: 12 },
     { name: "Max", sp: 10 },
 		{ name: "Leo", sp: 8 },
   ];
 
-  @observable filter = ''
-
-	@computed get totalSum() {
-    return this.devsList.reduce((summ, { sp }) => {
-      return summ + sp
-    }, 0)
-  };
- 
-  @computed get topPerformer() {
-    return this.devsList.reduce((acc, dev) => {
-      return dev.sp > acc.sp ? dev : acc
-    }, { name: '', sp: 0 })
+	get totalSum() {
+    return 0;
   };
 
-  @computed get filteredDevelopers() {
-    const matchesFilter = new RegExp(this.filter, 'i')
-    return this.devsList.filter(({ name }) => !this.filter || matchesFilter.test(name))
-  }
-
-  @action clearList() { 
-    this.devsList = []
+  get topPerformer() {
+    return {
+      name: 'Name',
+    };
   };
 
-  @action addDeveloper(dev) {
-    this.devsList.push(dev)
+  clearList() {
+
   };
 
-  @action updateFilter(value) {
-    this.filter = value
-  }
+  addDeveloper(dev) {
+
+  };
 };
-
-// decorate(Store, {
-//   devsList: observable,
-//   totalSum: computed,
-//   topPerformer: computed,
-//   clearList: action,
-//   addDeveloper: action,
-// })
 
 const appStore = new Store();
 
@@ -64,7 +43,6 @@ const Row = ({ data: { name, sp } }) => {
 	);
 };
 
-@observer
 class Table extends Component {
   render() {
     const { store } = this.props;
@@ -78,7 +56,7 @@ class Table extends Component {
           </tr>
         </thead>
         <tbody>
-          {store.filteredDevelopers.map((dev, i) => <Row key={i} data={dev} />)}
+          {store.devsList.map((dev, i) => <Row key={i} data={dev} />)}
         </tbody>
         <tfoot>
           <tr>
@@ -95,7 +73,6 @@ class Table extends Component {
   }
 }
 
-@observer
 class Controls extends Component {
   addDeveloper = () => {
     const name = prompt("The name:");
@@ -105,14 +82,11 @@ class Controls extends Component {
 
   clearList = () => { this.props.store.clearList(); }
 
-  onChangeFilter = ({ target }) => this.props.store.updateFilter(target.value)
-
   render() {
     return (
 			<div className="controls">
       	<button onClick={this.clearList}>Clear table</button>
       	<button onClick={this.addDeveloper}>Add record</button>
-        <input type="text" value={this.props.store.filter} onChange={this.onChangeFilter}/>
     	</div>
 		);
   }
@@ -131,4 +105,4 @@ class App extends Component {
   }
 }
 
-ReactDOM.render(<App />, document.getElementById('root'));
+ReactDOM.render(<App store={Store} />, document.getElementById('root'));
