@@ -1,41 +1,43 @@
 import './index.css';
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
-import { observable, computed, configure, action, runInAction} from 'mobx';
+import { observable, configure, action, when, autorun } from 'mobx';
 import { observer } from 'mobx-react';
 import DevTools from 'mobx-react-devtools';
 configure({ enforceActions: 'observed' });
 
 class Store {
-  @observable user: null;
-
-	@action.bound getUser() {
-    fetch('https://randomuser.me/api')
-      .then(res => res.json())
-      .then(json => {
-        if (json.results) {
-          // this.setUser(json.results)
-          runInAction(() => this.user = json.results[0])
-        }
-      })
-  }
-
-  @action setUser(results) {
-    this.user = results[0]
-  }
+  @observable count = 0;
+	@action increment() { this.count++ };
+  @action decrement() { this.count-- };
 };
 
 const appStore = new Store();
 
-@observer class App extends Component {
-  render() {
-    const { store } = this.props;
+when(
+  () => appStore.count > 5,
+  () => alert('💩'),
+)
 
+autorun(
+  () => alert(`Count: ${appStore.count}`),
+  {
+    name: 'Custom autorun',
+    delay: 3000,
+  }
+)
+
+
+@observer class App extends Component {
+  handleIncrement = () => {this.props.store.increment() }
+  handleDecrement = () => {this.props.store.decrement() }
+  render() {
     return (
       <div>
 				<DevTools />
-        <button onClick={store.getUser}>Get User</button>
-        <h1>{store.user ? store.user.login.username : 'Default name'}</h1>
+        <h1>{this.props.store.count}</h1>
+        <button onClick={this.handleDecrement}>-1</button>
+        <button onClick={this.handleIncrement}>+1</button>
       </div>
     )
   }
