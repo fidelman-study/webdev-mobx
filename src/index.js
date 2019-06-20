@@ -2,18 +2,23 @@ import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
 import * as serviceWorker from './serviceWorker';
 import DevTools from 'mobx-react-devtools';
-import { observable } from 'mobx'
+import { observable, computed } from 'mobx'
 import { observer } from 'mobx-react'
 
-const counterState = observable({
-  count: 0,
-})
+const nickName = new class UserNickName {
+  @observable firstName = 'Andrei'
+  @observable age = 25
 
-counterState.increment = function() {
-  this.count++
+  @computed get nickName() {
+    return `${this.firstName}-${this.age}`
+  }
 }
-counterState.decrement = function() {
-  this.count--
+
+nickName.increment = function() {
+  this.age++
+}
+nickName.decrement = function() {
+  this.age--
 }
 
 @observer
@@ -25,7 +30,7 @@ class Counter extends Component {
     return (
       <div className="App">
         <DevTools />
-        <h1>Count: {this.props.store.count}</h1>
+        <h1>{this.props.store.nickName}</h1>
         <button onClick={this.handleClickDecrement}>-1</button>
         <button onClick={this.handleClickIncrement}>+1</button>
       </div>
@@ -33,6 +38,6 @@ class Counter extends Component {
   }
 }
 
-ReactDOM.render(<Counter store={counterState} />, document.getElementById('root'));
+ReactDOM.render(<Counter store={nickName} />, document.getElementById('root'));
 
 serviceWorker.unregister();
